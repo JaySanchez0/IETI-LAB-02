@@ -9,6 +9,10 @@ import LockIcon from '@material-ui/icons/LockOutlined';
 import Paper from '@material-ui/core/Paper';
 import TodoApp from './TodoApp';
 import Typography from '@material-ui/core/Typography';
+import Snackbar from '@material-ui/core/Snackbar';
+import SnackbarContent from '@material-ui/core/SnackbarContent';
+import CloseIcon from '@material-ui/icons/Close';
+import InfoIcon from '@material-ui/icons/Info';
 import './Login.css'
 
 
@@ -16,10 +20,11 @@ export default class Login extends React.Component{
 
     constructor(props){
         super(props);
-        this.state={email:'',paasword:''};
+        this.state={email:'',password:'',isLoggedIn:false,validUser:['jay@mail.com','test'],badLogin:false};
         this.setEmail = this.setEmail.bind(this);
         this.setPassword = this.setPassword.bind(this);
         this.login = this.login.bind(this);
+        this.closeBadLogedSnack = this.closeBadLogedSnack.bind(this);
     }
 
     setEmail(email){
@@ -33,11 +38,26 @@ export default class Login extends React.Component{
     }
 
     login(){
-        localStorage.setItem("isLoggedIn",true);
+        const userValid = this.state.validUser;
+        console.log(userValid);
+        console.log(this.state.email+" "+this.state.password);
+        if(this.state.email==userValid[0] && this.state.password==userValid[1]){
+            this.state.isLoggedIn = true;
+            localStorage.setItem("isLoggedIn",true);
+        }else{
+            this.state.badLogin=true;
+        }
+        this.setState(this.state);
+    }
+    closeBadLogedSnack(){
+        this.state.badLogin = false;
         this.setState(this.state);
     }
 
     render(){
+        const CloseMenssage = (
+            <Button color="secondary" size="small" onClick={this.closeBadLogedSnack}><CloseIcon style={{background:'white'}}></CloseIcon></Button>
+        );
         if(localStorage.getItem("isLoggedIn")!=null){
             return <TodoApp></TodoApp>
         }
@@ -73,6 +93,17 @@ export default class Login extends React.Component{
                                 Sign in
                             </Button>
                     </Paper>
+                    <Snackbar
+                        anchorOrigin={{ vertical:'top', horizontal:'center' }}
+                        autoHideDuration={1}
+                        open={this.state.badLogin}
+                        onClose={()=>this.closeBadLogedSnack}
+                        >
+                            <SnackbarContent 
+                                style={{background:'red'}}
+                                action={CloseMenssage}
+                                message="Verifique los datos de login, usuario y/o contraseña incorrectos"/>
+                        </Snackbar>
                 </main>
             </React.Fragment>
         );
